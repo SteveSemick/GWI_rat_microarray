@@ -20,9 +20,13 @@ res_stats = lapply(res, function(x) x[,1:21] )
 res_stats = lapply(res_stats, function(x) x[,-c(11,12)] )
 res_stats = lapply(res_stats, function(x) x[order(x[,'P-val']),] ) 
 
+###
+res_FDR05 = lapply(res_stats, function(x) x[x[,'FDR P-val']<0.05,])
+
 ### Export results
 # Write xlsx file
 openxlsx::write.xlsx(res_stats, file='TAC/SST-RMA_BothRegions/MergedStats.xlsx' )
+openxlsx::write.xlsx(res_FDR05, file='TAC/SST-RMA_BothRegions/MergedStats_FDR05.xlsx' )
 
 # Write rda
 save(res_stats, file='TAC/SST-RMA_BothRegions/MergedStats.rda')
