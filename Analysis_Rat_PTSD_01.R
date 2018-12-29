@@ -121,17 +121,18 @@ conMat_FC = makeContrasts(GroupA-GroupB,GroupA-GroupC,GroupB-GroupC,levels=fitFC
 fitCon_FC = contrasts.fit(fitFC,conMat_FC)
 fitConEb_FC = eBayes(fitCon_FC)
 
-topTable(fitConEb_FC, genelist=probeMap)
-topTable(fitConEb_FC, coef="GroupA - GroupB", genelist=probeMap)
-topTable(fitConEb_FC, coef="GroupA - GroupC", genelist=probeMap)
-topTable(fitConEb_FC, coef="GroupB - GroupC", genelist=probeMap)
+## Test models
+stats_FC_ALL <- topTable(fitConEb_FC, num = Inf, genelist=probeMap)[,-c(5,6,7)]
+colnames(stats_FC_ALL) <- paste0("FC_ALL_",colnames(stats_FC_ALL))
 
-### Ordinal model
-modFC_ord =model.matrix(~ as.numeric(factor(pd[pd$brain_region=="FC",'Group']) ) )
-fitFC_ord = lmFit(exprsFC, modFC_ord)
-fitEb_FC_ord = eBayes(fitFC_ord)
-res = topTable(fitEb_FC_ord,genelist=probeMap, n=Inf)
-table(res$`adj.P.Val`<0.05)
+stats_FC_AvB <- topTable(fitConEb_FC, num = Inf, coef="GroupA - GroupB")
+colnames(stats_FC_AvB) <- paste0("FC_AvB_",colnames(stats_FC_AvB))
+
+stats_FC_AvC <- topTable(fitConEb_FC, num = Inf, coef="GroupA - GroupC")
+colnames(stats_FC_AvC) <- paste0("FC_AvC_",colnames(stats_FC_AvC))
+
+stats_FC_BvC <- topTable(fitConEb_FC, num = Inf, coef="GroupB - GroupC")
+colnames(stats_FC_BvC) <- paste0("FC_BvC_",colnames(stats_FC_BvC))
 
 ## LA 
 modLA=model.matrix(~0+pd[pd$brain_region=="LA",'Group'])
@@ -143,32 +144,45 @@ conMat_LA = makeContrasts(GroupA-GroupB,GroupA-GroupC,GroupB-GroupC,levels=fitLA
 fitCon_LA = contrasts.fit(fitLA,conMat_LA)
 fitConEb_LA = eBayes(fitCon_LA)
 
-topTable(fitConEb_LA, genelist=probeMap)[1,]
-topTable(fitConEb_LA, coef="GroupA - GroupB",genelist=probeMap)
-topTable(fitConEb_LA, coef="GroupA - GroupC",genelist=probeMap)
-topTable(fitConEb_LA, coef="GroupB - GroupC",genelist=probeMap)
+## Test models
+stats_LA_ALL <- topTable(fitConEb_LA, num = Inf)[,-(1:3)]
+colnames(stats_LA_ALL) <- paste0("LA_ALL_",colnames(stats_LA_ALL))
 
-### Ordinal model
-modLA_ord =model.matrix(~ as.numeric(factor(pd[pd$brain_region=="LA",'Group']) ) )
-fitLA_ord = lmFit(exprsLA, modLA_ord)
-fitEb_LA_ord = eBayes(fitLA_ord)
-res = topTable(fitEb_LA_ord,genelist=probeMap, n=Inf)
-table(res$`adj.P.Val`<0.05)
+stats_LA_AvB <- topTable(fitConEb_LA, num = Inf, coef="GroupA - GroupB")
+colnames(stats_LA_AvB) <- paste0("LA_AvB_",colnames(stats_LA_AvB))
 
-### Integrating both brain regions
-mod=model.matrix(~0+pd$Group+pd$brain_region)
-colnames(mod)= c('GroupA', 'GroupB', 'GroupC', "LA")
+stats_LA_AvC <- topTable(fitConEb_LA, num = Inf, coef="GroupA - GroupC")
+colnames(stats_LA_AvC) <- paste0("LA_AvC_",colnames(stats_LA_AvC))
 
-fit = lmFit(exprs, mod)
-conMat = makeContrasts(GroupA-GroupB,GroupA-GroupC,GroupB-GroupC,levels=fit)
-fitCon = contrasts.fit(fit,conMat)
-fitConEb = eBayes(fitCon)
+stats_LA_BvC <- topTable(fitConEb_LA, num = Inf, coef="GroupB - GroupC")
+colnames(stats_LA_BvC) <- paste0("LA_BvC_",colnames(stats_LA_BvC))
 
-res = topTable(fitConEb, genelist=probeMap, n=Inf)
-topTable(fitConEb_LA, coef="GroupA - GroupB",genelist=probeMap)
-topTable(fitConEb_LA, coef="GroupA - GroupC",genelist=probeMap)
-topTable(fitConEb_FC, coef="GroupB - GroupC",genelist=probeMap)
 
+############## Merge all these tests ############
+baseRownames = rownames(stats_FC_ALL)
+mergedStats=
+  cbind(stats_FC_ALL[baseRownames, ],
+        stats_FC_AvB[baseRownames, ],
+        stats_FC_AvC[baseRownames, ],
+        stats_FC_BvC[baseRownames, ],
+        stats_LA_ALL[baseRownames, ],
+        stats_LA_AvB[baseRownames, ],
+        stats_LA_AvC[baseRownames, ],
+        stats_LA_BvC[baseRownames, ])
+sapply(mergedStats[,grep("adj.P.Val",colnames(mergedStats)) ], function(x) sum(x<0.25,na.rm=T) )
+
+### Reorder columns
+col_order = c(colnames(mergedStats)[1:4], 
+              grep("_adj.P.Val",colnames(mergedStats),value=T),	  
+              grep("_logFC",colnames(mergedStats),value=T),
+              grep("_P.Value",colnames(mergedStats),value=T),
+              grep("_t$",colnames(mergedStats),value=T,fixed=F),
+              grep("_AveExpr$",colnames(mergedStats),value=T,fixed=F),
+              grep("_B$",colnames(mergedStats),value=T,fixed=F),
+              grep("_F$",colnames(mergedStats),value=T,fixed=F))
+mergedStats=mergedStats[,col_order]			
+save(mergedStats, file='rda/mergedStats_RMA_R.rda')
+write.csv(mergedStats, file='csvs/mergedStats_RMA_R.csv')
 ###### Gene set annotation
 
 
