@@ -111,6 +111,8 @@ summary(lm(pd$PC1~ as.numeric(as.factor(pd$Group))+pd$brain_region ))
 #exprs=exprs[rownames(exprs)%in%probeMap$PROBEID,]
 ## Modeling with limma
 library(limma)
+
+######## Fully partitioned dataset analysis ############3
 ## FC 
 modFC=model.matrix(~0+pd[pd$brain_region=="FC",'Group'])
 colnames(modFC)= c('GroupA', 'GroupB', 'GroupC')
@@ -183,6 +185,62 @@ col_order = c(colnames(mergedStats)[1:4],
 mergedStats=mergedStats[,col_order]			
 save(mergedStats, file='rda/mergedStats_RMA_R.rda')
 write.csv(mergedStats, file='csvs/mergedStats_RMA_R.csv')
+
+
+######## Contrasted dataset analysis ############3
+pd$Group_X_Region = paste0(pd$Group, "_", pd$brain_region)
+pd$Group_X_Region = factor(pd$Group_X_Region)
+modFull=model.matrix(~0+pd[,'Group_X_Region'])
+colnames(modFull)= levels(pd$Group_X_Region)
+
+fitFull = lmFit(exprs, modFull)
+conMatFull = makeContrasts(GroupA_FC-GroupB_FC,GroupA_FC-GroupC_FC,GroupB_FC-GroupC_FC,GroupA_LA-GroupB_LA,GroupA_LA-GroupC_LA,GroupB_LA-GroupC_LA, levels=fitFull)
+fitCon_Full = contrasts.fit(fitFull,conMatFull)
+fitConEb = eBayes(fitCon_Full)
+
+## Test models
+Full_stats_FC_AvB <- topTable(fitConEb, num = Inf, coef="GroupA_FC - GroupB_FC", genelist=probeMap)
+colnames(Full_stats_FC_AvB) <- paste0("FC_AvB_",colnames(Full_stats_FC_AvB))
+
+Full_stats_FC_AvC <- topTable(fitConEb, num = Inf, coef="GroupA_FC - GroupC_FC")
+colnames(Full_stats_FC_AvC) <- paste0("FC_AvC_",colnames(Full_stats_FC_AvC))
+
+Full_stats_FC_BvC <- topTable(fitConEb, num = Inf, coef="GroupB_FC - GroupC_FC")
+colnames(Full_stats_FC_BvC) <- paste0("FC_BvC_",colnames(Full_stats_FC_BvC))
+
+Full_stats_LA_AvB <- topTable(fitConEb, num = Inf, coef="GroupA_LA - GroupB_LA")
+colnames(Full_stats_LA_AvB) <- paste0("LA_AvB_",colnames(Full_stats_LA_AvB))
+
+Full_stats_LA_AvC <- topTable(fitConEb, num = Inf, coef="GroupA_LA - GroupC_LA")
+colnames(Full_stats_LA_AvC) <- paste0("LA_AvC_",colnames(Full_stats_LA_AvC))
+
+Full_stats_LA_BvC <- topTable(fitConEb, num = Inf, coef="GroupB_LA - GroupC_LA")
+colnames(Full_stats_LA_BvC) <- paste0("LA_BvC_",colnames(Full_stats_LA_BvC))
+
+############## Merge all these tests ############
+baseRownames = rownames(Full_stats_FC_AvB)
+mergedStats=
+  cbind(Full_stats_FC_AvB[baseRownames, ],
+        Full_stats_FC_AvC[baseRownames, ],
+        Full_stats_FC_BvC[baseRownames, ],
+        Full_stats_LA_AvB[baseRownames, ],
+        Full_stats_LA_AvC[baseRownames, ],
+        Full_stats_LA_BvC[baseRownames, ])
+sapply(mergedStats[,grep("adj.P.Val",colnames(mergedStats)) ], function(x) sum(x<0.10,na.rm=T) )
+
+### Reorder columns
+col_order = c(colnames(mergedStats)[1:4], 
+              grep("_adj.P.Val",colnames(mergedStats),value=T),	  
+              grep("_logFC",colnames(mergedStats),value=T),
+              grep("_P.Value",colnames(mergedStats),value=T),
+              grep("_t$",colnames(mergedStats),value=T,fixed=F),
+              grep("_AveExpr$",colnames(mergedStats),value=T,fixed=F),
+              grep("_B$",colnames(mergedStats),value=T,fixed=F),
+              grep("_F$",colnames(mergedStats),value=T,fixed=F))
+mergedStats=mergedStats[,col_order]			
+save(mergedStats, file='rda/FullModel_mergedStats_RMA_R.rda')
+write.csv(mergedStats, file='csvs/FullModel_mergedStats_RMA_R.csv')
+
 ###### Gene set annotation
 
 
