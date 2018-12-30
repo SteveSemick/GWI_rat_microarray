@@ -19,3 +19,4 @@ Clariom_S_Rat.r1.na36.rn6.a1.transcript.csv/
 ## Ignore log files
 logs
 .Rproj.user
+*.log
