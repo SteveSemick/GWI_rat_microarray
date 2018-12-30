@@ -16,6 +16,7 @@ tmp = lapply(res_stats[2:6], function(x) {x[match(merged_SstRma$ID,x[,'ID']),2:1
 
 #tmp2  = mapply( function(x,y) setNames(object=x, y), tmp, newNames)
 merged_SstRma = cbind(merged_SstRma, do.call("cbind", tmp))
+save(merged_SstRma, file='rda/merged_sstRma_results.rda')
 
 FDR_Col = grep("FDR",colnames(merged_SstRma),value=T)
 
@@ -47,10 +48,6 @@ LA_Venn_ID = venn.diagram(x = SigIDs[grep("LA", names(SigIDs),value=T)],
                           #cat.just=list(c(0.9,1.5) , c(-0.8,5) ), 
                           cex=5, cat.cex=2)
 
-pdf('plots/LA_Venn_ID_FDR10.pdf')
-grid.draw(LA_Venn_ID)
-dev.off()
-
 ## sig AvB
 AvB_Venn_ID = venn.diagram(x = SigIDs[grep("AvB", names(SigIDs),value=T)],
                           category.names = c('FC','LA'),
@@ -60,9 +57,6 @@ AvB_Venn_ID = venn.diagram(x = SigIDs[grep("AvB", names(SigIDs),value=T)],
                           main.cex = 5,
                           #cat.just=list(c(0.9,1.5) , c(-0.8,5) ), 
                           cex=5, cat.cex=2)
-pdf('plots/AvB_Venn_ID_FDR10.pdf')
-grid.draw(AvB_Venn_ID)
-dev.off()
 
 ## sig AvC
 AvC_Venn_ID = venn.diagram(x = SigIDs[grep("AvC", names(SigIDs),value=T)],
@@ -73,11 +67,6 @@ AvC_Venn_ID = venn.diagram(x = SigIDs[grep("AvC", names(SigIDs),value=T)],
                           main.cex = 5,
                           #cat.just=list(c(0.9,1.5) , c(-0.8,5) ), 
                           cex=5, cat.cex=2)
-pdf('plots/AvC_Venn_ID_FDR10.pdf')
-grid.draw(AvC_Venn_ID)
-dev.off()
-
-
 ## sig BvC
 BvC_Venn_ID = venn.diagram(x = SigIDs[grep("BvC", names(SigIDs),value=T)],
                           category.names = c('FC','LA'),
@@ -94,7 +83,3 @@ grid.draw(AvC_Venn_ID)
 grid.newpage()
 grid.draw(BvC_Venn_ID)
 dev.off()
-
-#### 
-table(duplicated(merged_SstRma$`Gene Symbol`))
-table(grepl(";", merged_SstRma$`Gene Symbol`))
