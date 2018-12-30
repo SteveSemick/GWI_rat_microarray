@@ -50,3 +50,51 @@ LA_Venn_ID = venn.diagram(x = SigIDs[grep("LA", names(SigIDs),value=T)],
 pdf('plots/LA_Venn_ID_FDR10.pdf')
 grid.draw(LA_Venn_ID)
 dev.off()
+
+## sig AvB
+AvB_Venn_ID = venn.diagram(x = SigIDs[grep("AvB", names(SigIDs),value=T)],
+                          category.names = c('FC','LA'),
+                          filename = NULL,
+                          fill = c('red', 'blue'),
+                          main = 'A vs. B',
+                          main.cex = 5,
+                          #cat.just=list(c(0.9,1.5) , c(-0.8,5) ), 
+                          cex=5, cat.cex=2)
+pdf('plots/AvB_Venn_ID_FDR10.pdf')
+grid.draw(AvB_Venn_ID)
+dev.off()
+
+## sig AvC
+AvC_Venn_ID = venn.diagram(x = SigIDs[grep("AvC", names(SigIDs),value=T)],
+                          category.names = c('FC','LA'),
+                          filename = NULL,
+                          fill = c('red', 'blue'),
+                          main = 'A vs. C',
+                          main.cex = 5,
+                          #cat.just=list(c(0.9,1.5) , c(-0.8,5) ), 
+                          cex=5, cat.cex=2)
+pdf('plots/AvC_Venn_ID_FDR10.pdf')
+grid.draw(AvC_Venn_ID)
+dev.off()
+
+
+## sig BvC
+BvC_Venn_ID = venn.diagram(x = SigIDs[grep("BvC", names(SigIDs),value=T)],
+                          category.names = c('FC','LA'),
+                          filename = NULL,
+                          fill = c('red', 'blue'),
+                          main = 'B vs. C',
+                          main.cex = 5,
+                          #cat.just=list(c(0.9,1.5) , c(-0.8,5) ), 
+                          cex=5, cat.cex=2)
+pdf('plots/Comparison_Overlap_BetweenRegions_Venn_ID_FDR10.pdf')
+grid.draw(AvB_Venn_ID)
+grid.newpage()
+grid.draw(AvC_Venn_ID)
+grid.newpage()
+grid.draw(BvC_Venn_ID)
+dev.off()
+
+#### 
+table(duplicated(merged_SstRma$`Gene Symbol`))
+table(grepl(";", merged_SstRma$`Gene Symbol`))
