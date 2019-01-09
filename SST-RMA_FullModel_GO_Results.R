@@ -3,7 +3,7 @@ library(DOSE)
 library(ReactomePA)
 library(org.Rn.eg.db)
 #
-
+setwd('C:/Users/steph/Documents/R/UMB/PTSD_Rat_Project')
 load('rda/merged_sstRma_results.rda')
 #### 
 table(duplicated(merged_SstRma$`Gene Symbol`))
@@ -43,5 +43,5 @@ compareGo = lapply(list(compareGoMf=compareGoMf, compareGoBp=compareGoBp, compar
 ## Export results
 save(compareKegg,compareGoMf,compareGoBp,compareGoCc, file='rda/GO_Results.rda')
 openxlsx::write.xlsx(lapply(c(compareGo,compareKegg=compareKegg), summary),
-                     file = 'csvs/PTSD_FullModel_SST-RMA_TAC_5e-3_unsplit.xlsx')
+                     file = 'csvs/GO_Analysis_PTSD_FullModel_SST-RMA_TAC_5e-3_unsplit.xlsx')
 

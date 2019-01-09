@@ -243,34 +243,3 @@ write.csv(mergedStats, file='csvs/FullModel_mergedStats_RMA_R.csv')
 
 ###### Gene set annotation
 
-
-###
-### Create boxplots
-pdf('plots/SupplementalFigure_best_ERC_subset_DMC_boxplots.pdf',height=10,width=12,useDingbats=FALSE)
-for (cpg_i in ERC_sigCpG) {
-  
-  #Change column name for ggplot2 to work
-  ii=match(cpg_i, regionSpecific_mergedStats$Name)
-  
-  pc_genes=unique(unlist(strsplit(regionSpecific_mergedStats[ii,'within10kb_geneSymbol_gencode_hg38'], ";")))
-  pc_genes=pc_genes[pc_genes%in%protein_coding_genes_gcV25]
-  
-  fixName= paste(pc_genes, collapse = ", " )
-  custom_title = paste0( 
-    "ERC p=",as.character(signif(regionSpecific_mergedStats[ii,'ERC_subset_NoAdj_P.Value'],3)), 
-    "\n ",fixName ) #custom title
-  
-  a = ggplot(dat, aes_string(x = 'Dx', y = cpg_i, fill='Dx')) +
-    geom_boxplot(outlier.colour = NA, alpha = 0.1, col='black')  + 
-    geom_jitter(aes(col=`Dx`),width=0.3,size=2 ) + 
-    labs(y=paste0(cpg_i, "\nDNAm level"),x="Diagnosis", title = custom_title) + 
-    #		scale_colour_brewer(palette = "Set1") +
-    #		scale_fill_brewer(palette = "Set1") + 
-    scale_fill_manual(values=c("black","#ab1323" ) ) + 
-    scale_colour_manual(values=c("black","#ab1323" ) ) + 
-    theme(legend.position='none') +
-    theme(axis.title.x=element_blank(), axis.text.x=element_text(size=40,colour='black')) 
-  
-  print(a)			
-}
-dev.off()

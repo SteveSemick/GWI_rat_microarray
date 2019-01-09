@@ -190,9 +190,17 @@ colnames(res_stats_FC) <- paste0(colnames(res_stats_FC), "_FC")
 colnames(res_stats_FC) <- gsub("_v_", "v", colnames(res_stats_FC) )
 res_stats_LFC = log2(abs(res_stats_FC))
 ##
-cor.test(res_stats_FC[,'FC_AvB_FC'], mergedStats[,'FC_AvB_logFC'])
-cor.test(res_stats_FC[,'FC_AvC_FC'], mergedStats[,'FC_AvC_logFC'])
-cor.test(res_stats_FC[,'FC_BvC_FC'], mergedStats[,'FC_BvC_logFC'])
+cor.test(res_stats[[1]][match(rownames(mergedStats) , res_stats[[1]][,'ID']),'B Avg (log2)'] - res_stats[[1]][match(rownames(mergedStats) , res_stats[[1]][,'ID']),'A Avg (log2)'] , mergedStats[,'FC_AvB_logFC'])
+cor.test(res_stats[[1]][match(rownames(mergedStats) , res_stats[[1]][,'ID']),'A Avg (log2)'] - res_stats[[1]][match(rownames(mergedStats) , res_stats[[1]][,'ID']),'B Avg (log2)'] , mergedStats[,'FC_AvB_logFC'])
+
+plot(res_stats[[1]][match(rownames(mergedStats) , res_stats[[1]][,'ID']),'A Avg (log2)'] - res_stats[[1]][match(rownames(mergedStats) , res_stats[[1]][,'ID']),'B Avg (log2)'] , mergedStats[,'FC_AvB_logFC'])
+
+
+
+cor.test(res_stats_FC[,'FC_AvB_FC'], 2^mergedStats[,'FC_AvB_logFC'])
+plot(res_stats_FC[,'FC_AvB_FC'], 2^mergedStats[,'FC_AvB_logFC'])
+cor.test(res_stats_FC[,'FC_AvC_FC'], 2^mergedStats[,'FC_AvC_logFC'])
+cor.test(res_stats_FC[,'FC_BvC_FC'], 2^mergedStats[,'FC_BvC_logFC'])
 #
 cor.test(res_stats_P[,'LA_AvB_P'], mergedStats[,'LA_AvB_P.Value'])
 cor.test(res_stats_P[,'LA_AvC_P'], mergedStats[,'LA_AvC_P.Value'])
