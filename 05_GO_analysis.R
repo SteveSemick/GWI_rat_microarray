@@ -25,19 +25,40 @@ sigStats =sigStats[-grep(";",sigStats$EntrezID),]
 sigStats$EntrezID = as.character(sigStats$EntrezID)
 ## by sign
 gList = split(sigStats$EntrezID, sigStats$Sign)
-lengths(gLsit)
+lengths(gList)
+###
+#FC_compareKegg = compareCluster(gList, fun = "enrichKEGG",organism = "rno", 
+#                             universe = univ, qvalueCutoff = 0.2, pvalueCutoff = 0.05)
+FC_compareGoMf = compareCluster(gList, fun = "enrichGO", universe = univ, ont = "MF",OrgDb=org.Rn.eg.db, qvalueCutoff = 0.2, pvalueCutoff = 0.05, readable = TRUE)
+FC_compareGoBp = compareCluster(gList, fun = "enrichGO", universe = univ, ont = "BP",OrgDb=org.Rn.eg.db,qvalueCutoff = 0.2, pvalueCutoff = 0.05, readable = TRUE)
+#FC_compareGoCc = compareCluster(gList, fun = "enrichGO", universe = univ, ont = "CC",OrgDb=org.Rn.eg.db, #qvalueCutoff = 0.2, pvalueCutoff = 0.05, readable = TRUE)
+#compareDO   = compareCluster(gList, fun = "enrichDO", universe = univ,	qvalueCutoff = 0.2, pvalueCutoff = 0.05, readable = TRUE)
 
-compareKegg = compareCluster(statList, fun = "enrichKEGG",organism = "rno", universe = univ, qvalueCutoff = 0.2, pvalueCutoff = 0.05)
-compareGoMf = compareCluster(statList, fun = "enrichGO", universe = univ, ont = "MF",OrgDb=org.Rn.eg.db, qvalueCutoff = 0.2, pvalueCutoff = 0.05, readable = TRUE)
-compareGoBp = compareCluster(statList, fun = "enrichGO", universe = univ, ont = "BP",OrgDb=org.Rn.eg.db,qvalueCutoff = 0.2, pvalueCutoff = 0.05, readable = TRUE)
-compareGoCc = compareCluster(statList, fun = "enrichGO", universe = univ, ont = "CC",OrgDb=org.Rn.eg.db, qvalueCutoff = 0.2, pvalueCutoff = 0.05, readable = TRUE)
-#compareDO   = compareCluster(statList, fun = "enrichDO", universe = univ,	qvalueCutoff = 0.2, pvalueCutoff = 0.05, readable = TRUE)
-#compareReact= compareCluster(statList, fun="enrichPathway", universe = univ, 
-#                             qvalueCutoff = 0.2, pvalueCutoff = 0.05, readable = TRUE)
-
-compareGo = lapply(list(compareGoMf=compareGoMf, compareGoBp=compareGoBp, compareGoCc=compareGoCc),simplify)
+FC_compareGo = lapply(list(compareGoMf=FC_compareGoMf, compareGoBp=FC_compareGoBp),simplify)
 
 ## Export results
-save(compareKegg,compareGoMf,compareGoBp,compareGoCc, file='rda/GO_Results.rda')
-openxlsx::write.xlsx(lapply(c(compareGo,compareKegg=compareKegg), summary),
-                     file = 'csvs/GO_Analysis_PTSD_FullModel_SST-RMA_TAC_5e-3_unsplit.xlsx')
+save(FC_compareGo, FC_compareGoMf,FC_compareGoBp, file='rda/FC_GO_Results.rda')
+openxlsx::write.xlsx(lapply(FC_compareGo, summary), file = 'csvs/GO_FC_Injury_SST-RMA_R_1e-2_split.xlsx')
+
+## up and down stats - LA
+sigStats = merged_SstRma_disease[which(merged_SstRma_disease[,'LA_CTRL_v_PYR_LPS-P.Value'] < 1e-2), c("LA_CTRL_v_PYR_LPS-logFC", "LA_CTRL_v_PYR_LPS-adj.P.Val", "EntrezID")]
+sigStats$Sign = sign(sigStats$`LA_CTRL_v_PYR_LPS-logFC`)
+sigStats = sigStats[!is.na(sigStats$EntrezID),]
+sigStats = sigStats[!duplicated(sigStats[,c("EntrezID")]),]
+sigStats =sigStats[-grep(";",sigStats$EntrezID),]
+sigStats$EntrezID = as.character(sigStats$EntrezID)
+## by sign
+gList = split(sigStats$EntrezID, sigStats$Sign)
+lengths(gList)
+###
+LA_compareKegg = compareCluster(gList, fun = "enrichKEGG",organism = "rno", 
+                                universe = univ, qvalueCutoff = 0.2, pvalueCutoff = 0.05)
+LA_compareGoMf = compareCluster(gList, fun = "enrichGO", universe = univ, ont = "MF",OrgDb=org.Rn.eg.db, qvalueCutoff = 0.2, pvalueCutoff = 0.05, readable = TRUE)
+LA_compareGoBp = compareCluster(gList, fun = "enrichGO", universe = univ, ont = "BP",OrgDb=org.Rn.eg.db,qvalueCutoff = 0.2, pvalueCutoff = 0.05, readable = TRUE)
+LA_compareGoCc = compareCluster(gList, fun = "enrichGO", universe = univ, ont = "CC",OrgDb=org.Rn.eg.db, qvalueCutoff = 0.2, pvalueCutoff = 0.05, readable = TRUE)
+
+LA_compareGo = lapply(list(compareGoMf=LA_compareGoMf, compareGoBp=LA_compareGoBp, compareGoCc=LA_compareGoCc),simplify)
+
+## Export results
+save(LA_compareGo,LA_compareKegg, LA_compareGoMf,LA_compareGoBp, LA_compareGoCc, file='rda/LA_GO_Results.rda')
+openxlsx::write.xlsx(lapply(c(KEGG=LA_compareKegg, LA_compareGo), summary), file = 'csvs/GO_LA_Injury_SST-RMA_R_1e-2_split.xlsx')
