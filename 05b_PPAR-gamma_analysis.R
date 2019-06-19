@@ -46,6 +46,8 @@ PPAR_genes_extracted = PPAR_genes_extracted[!is.na(PPAR_genes_extracted$transcri
 ###
 merged_SstRma_disease$PPARg <- ifelse(merged_SstRma_disease$EntrezID %in% PPAR_genes_extracted$rat_Entrez, TRUE,FALSE)
 
+fisher.test(table(merged_SstRma_disease$PPARg,merged_SstRma_disease$Region_MinFDR<0.10) )
+fisher.test(table(merged_SstRma_disease$PPARg,merged_SstRma_disease$Region_MinFDR<0.05) )
 fisher.test(table(merged_SstRma_disease$PPARg,merged_SstRma_disease$Region_MinP<0.0001) )
 fisher.test(table(merged_SstRma_disease$PPARg,merged_SstRma_disease$Region_MinP<0.001) )
 fisher.test(table(merged_SstRma_disease$PPARg,merged_SstRma_disease$Region_MinP<0.01) )
@@ -61,7 +63,7 @@ table(PPAR_genes_extracted$minP_nomSig )
 table(PPAR_genes_extracted$minP_nomSig, PPAR_genes_extracted$Region_MinP<0.05)
 PPAR_genes_extracted[PPAR_genes_extracted$minP_nomSig,]
 
-cols_of_interest=c('transcriptCluster','Symbol',"human_Symbol",'Public Gene IDs','rat_ensemblTranscript','Description','Chromosome','Strand','Start','Stop','LA_AvB.P-val','LA_BvC.P-val','LA_AvB_log2FC', 'LA_BvC_log2FC','FC_AvB.P-val','FC_BvC.P-val','FC_AvB_log2FC', 'FC_BvC_log2FC')
+cols_of_interest=c('transcriptCluster','Symbol',"EntrezID",'Description','Chromosome','Strand','Start','Stop','FC_CTRL_v_PYR_LPS-P.Value','LA_CTRL_v_PYR_LPS-P.Value','FC_CTRL_v_PYR_LPS-logFC','LA_CTRL_v_PYR_LPS-logFC')
 write.csv(PPAR_genes_extracted[minPval_order,cols_of_interest],file='csvs/PPAR_gamma_Villapol2018_rat_gene_statistics_sortedBy_Control_v_Injury_minP_NomSig.csv',row.names=FALSE)
 
 #### Plot the PPAR-gamma related genes
