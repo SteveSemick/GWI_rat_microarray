@@ -21,7 +21,7 @@ pd$brain_region = jaffelab::ss(jaffelab::ss(pd$sampleNames,"_",2),"-",1)
 pd$sampleNum = jaffelab::ss(jaffelab::ss(pd$sampleNames,"_",2),"-",2)
 pd$sampleNum = as.numeric(gsub("\\..*","",pd$sampleNum))
 
-pd$Group = ifelse(pd$sampleNum %in% c(1,2,3), "CTRL", ifelse(pd$sampleNum %in% c(4,5,6), "PYR+LPS", "PYR+LPS+RGZ") ) # assigning
+pd$Group = ifelse(pd$sampleNum %in% c(1,2,3), "CTRL", ifelse(pd$sampleNum %in% c(4,5,6), "PYR_LPS", "PYR_LPS_RGZ") ) # assigning
 #CTRL - Control
 #LPS - lipopolysacharide
 #PYR - pyridostigmine
