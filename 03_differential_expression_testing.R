@@ -60,7 +60,7 @@ Global.Adjusted.P = data.frame(Global.Adjusted.P)
 ## Test models
 #Frontal cortex injury models
 Full_stats_FC_CTRLvPYR_LPS <- topTable(fitConEbInjury, num = Inf, coef="FC.Injury", genelist=tcMap, adjust.method='none')
-colnames(Full_stats_FC_CTRLvPYR_LPS)[11:16] <- paste0("FC_CTRL_v_PYR_LPS-",colnames(Full_stats_FC_CTRLvPYR_LPS)[11:16])
+colnames(Full_stats_FC_CTRLvPYR_LPS)[12:17] <- paste0("FC_CTRL_v_PYR_LPS-",colnames(Full_stats_FC_CTRLvPYR_LPS)[11:16])
 Full_stats_FC_CTRLvPYR_LPS$`FC_CTRL_v_PYR_LPS-adj.P.Val` <- Global.Adjusted.P[rownames(Full_stats_FC_CTRLvPYR_LPS), 'FC.Injury']  #Add global-corrected FDR
   
 #Lateral amygdala injury models
@@ -78,7 +78,7 @@ mergedStats=
 sapply(mergedStats[,grep("adj.P.Val",colnames(mergedStats)) ], function(x) sum(x<0.05,na.rm=T) )
 
 ### Reorder columns
-col_order = c(colnames(mergedStats)[1:10], 
+col_order = c(colnames(mergedStats)[1:11], 
               grep("-adj.P.Val",colnames(mergedStats),value=T),	  
               grep("-logFC",colnames(mergedStats),value=T),
               grep("-P.Value",colnames(mergedStats),value=T),

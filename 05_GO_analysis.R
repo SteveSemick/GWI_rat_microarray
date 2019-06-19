@@ -62,3 +62,28 @@ LA_compareGo = lapply(list(compareGoMf=LA_compareGoMf, compareGoBp=LA_compareGoB
 ## Export results
 save(LA_compareGo,LA_compareKegg, LA_compareGoMf,LA_compareGoBp, LA_compareGoCc, file='rda/LA_GO_Results.rda')
 openxlsx::write.xlsx(lapply(c(KEGG=LA_compareKegg, LA_compareGo), summary), file = 'csvs/GO_LA_Injury_SST-RMA_R_1e-2_split.xlsx')
+
+
+## Check for overlap between FC and LA Go categories
+load('rda/LA_GO_Results.rda')
+load('rda/FC_GO_Results.rda',verbose=T)
+
+intersect(summary(LA_compareGoMf)$ID, summary(FC_compareGoMf)$ID)
+
+simple_LA_compareGoBp = simplify(LA_compareGoBp)
+simple_FC_compareGoBp = simplify(FC_compareGoBp)
+
+#
+summary(simple_LA_compareGoBp)[summary(simple_LA_compareGoBp)$ID %in% intersect(summary(simple_LA_compareGoBp)$ID, summary(simple_FC_compareGoBp)$ID),'Description'] #simplify then intersect
+ 
+#save shared GoBp
+shared_GoBp = summary(simple_LA_compareGoBp)[summary(simple_LA_compareGoBp)$ID %in% intersect(summary(LA_compareGoBp)$ID, summary(FC_compareGoBp)$ID),] # intersect then simplify
+shared_GoBp = shared_GoBp[,c(c(2,3,1),4:10)]
+colnames(shared_GoBp)[3:10] <- paste0("LA_", colnames(shared_GoBp)[3:10])
+
+FC_compareGoBp_merge = summary(FC_compareGoBp)
+FC_compareGoBp_merge = FC_compareGoBp_merge[match(shared_GoBp$ID,FC_compareGoBp_merge$ID),]
+colnames(FC_compareGoBp_merge) = paste0("FC_", colnames(FC_compareGoBp_merge) )
+shared_GoBp = cbind(shared_GoBp, FC_compareGoBp_merge[,c(1,(4:10) )])
+write.csv(shared_GoBp, file = 'csvs/GO_SharedGoBp_Injury_SST-RMA_R_1e-2.csv',row.names=FALSE)
+
