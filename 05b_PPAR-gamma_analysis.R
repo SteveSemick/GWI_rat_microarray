@@ -43,6 +43,7 @@ PPAR_genes_extracted = cbind(merged_SstRma_disease[match(as.character(ratMapped_
 PPAR_genes_FAILED_extract = PPAR_genes_extracted[is.na(PPAR_genes_extracted$transcriptCluster) | PPAR_genes_extracted$"Symbol"=="" | is.na(PPAR_genes_extracted$rat_Entrez),]
 PPAR_genes_extracted = PPAR_genes_extracted[!is.na(PPAR_genes_extracted$transcriptCluster) & !PPAR_genes_extracted$"Symbol"=="" & !is.na(PPAR_genes_extracted$rat_Entrez),]
 
+human_PPARG_gene[!human_PPARG_gene%in%PPAR_genes_extracted$human_Symbol]
 ###
 merged_SstRma_disease$PPARg <- ifelse(merged_SstRma_disease$EntrezID %in% PPAR_genes_extracted$rat_Entrez, TRUE,FALSE)
 
@@ -63,8 +64,8 @@ table(PPAR_genes_extracted$minP_nomSig )
 table(PPAR_genes_extracted$minP_nomSig, PPAR_genes_extracted$Region_MinP<0.05)
 PPAR_genes_extracted[PPAR_genes_extracted$minP_nomSig,]
 
-cols_of_interest=c('transcriptCluster','Symbol',"EntrezID",'Description','Chromosome','Strand','Start','Stop','FC_CTRL_v_PYR_LPS-P.Value','LA_CTRL_v_PYR_LPS-P.Value','FC_CTRL_v_PYR_LPS-logFC','LA_CTRL_v_PYR_LPS-logFC')
-write.csv(PPAR_genes_extracted[minPval_order,cols_of_interest],file='csvs/PPAR_gamma_Villapol2018_rat_gene_statistics_sortedBy_Control_v_Injury_minP_NomSig.csv',row.names=FALSE)
+cols_of_interest=c('transcriptCluster','Symbol',"EntrezID",'gene_description','Region_MinP','minP_Bonferroni','FC_CTRL_v_PYR_LPS-P.Value','LA_CTRL_v_PYR_LPS-P.Value','FC_CTRL_v_PYR_LPS-logFC','LA_CTRL_v_PYR_LPS-logFC')
+write.csv(PPAR_genes_extracted[order(PPAR_genes_extracted$Region_MinP),cols_of_interest],file='csvs/PPAR_gamma_Villapol2018_rat_gene_statistics_sortedBy_Control_v_Injury_minP_NomSig.csv',row.names=FALSE)
 
 #### Plot the PPAR-gamma related genes
 Cont_v_Injury_genes <- read.csv('csvs/PPAR_gamma_Villapol2018_rat_gene_statistics_sortedBy_Control_v_Injury_minP_NomSig.csv',stringsAsFactors = F)
