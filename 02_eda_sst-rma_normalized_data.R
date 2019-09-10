@@ -63,3 +63,47 @@ t.test(pd$PC1~pd$brain_region)
 summary(lm(pd$PC2~ (as.factor(pd$Group))+pd$brain_region ))
 summary(aov(pd$PC2~pd$Group))
 t.test(pd$PC2~pd$brain_region)
+
+
+
+## PCA on lateral amygdala only 
+pca = prcomp(t(sst_rma_signal[,pd[pd$brain_region=='LA','sampleNames']]),scale.=TRUE)
+varPCs=getPcaVars(pca)
+exprsPCs=pca$x
+dat=pd[pd$brain_region=="LA",]
+dat=cbind(dat,exprsPCs[,1:5])
+colnames(dat)[(ncol(dat)-4):ncol(dat)] <- paste0("AmygOnly_", colnames(dat)[(ncol(dat)-4):ncol(dat)])
+dat$PC_VarExplained_AmygOnly = varPCs
+
+
+# Plotting
+PC1_2_group = ggplot(data=dat, aes(x=AmygOnly_PC1,y=AmygOnly_PC2,col=Group ) ) + 
+  geom_point(size=5) +	 
+  scale_colour_brewer(palette = "Set1") +
+  scale_fill_brewer(palette = "Set1") + 
+  labs(x=paste0("PC1"," (", as.character(signif(dat$PC_VarExplained_AmygOnly[1],3)),"%)" ),
+       y=paste0("PC2"," (", as.character(signif(dat$PC_VarExplained_AmygOnly[2],3)),"%)" )) +
+  theme(legend.position = c(.73,.87), 
+        legend.background = element_rect(colour = "black"),
+        legend.title=element_blank(),
+        legend.key = element_rect(size = 5),
+        legend.key.size = unit(1.5, 'lines') )+ scale_colour_brewer(palette="Set1")
+
+pdf('plots/PCA_AmygOnly_SST-RMA_Normalization.pdf', height=12,width=12)
+PC1_2_group
+dev.off()
+
+tiff('plots/PCA_AmygOnly_SST-RMA_Normalization.tiff', height=12,width=12, units = "in", res = 600)
+PC1_2_group
+dev.off()
+
+summary(aov(dat$AmygOnly_PC1~dat$Group))
+TukeyHSD(aov(dat$AmygOnly_PC1~dat$Group))
+
+summary(aov(dat$AmygOnly_PC2~dat$Group))
+TukeyHSD(aov(dat$AmygOnly_PC2~dat$Group))
+
+
+pairwise.t.test(dat$AmygOnly_PC1, dat$Group, p.adjust='none')
+pairwise.t.test(dat$AmygOnly_PC2, dat$Group, p.adjust='none')
+
