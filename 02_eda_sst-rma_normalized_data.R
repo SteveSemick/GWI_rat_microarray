@@ -107,3 +107,10 @@ TukeyHSD(aov(dat$AmygOnly_PC2~dat$Group))
 pairwise.t.test(dat$AmygOnly_PC1, dat$Group, p.adjust='none')
 pairwise.t.test(dat$AmygOnly_PC2, dat$Group, p.adjust='none')
 
+####
+signal_medians <- matrixStats::rowMedians(as.matrix(sst_rma_signal))
+
+hist_res <- hist(signal_medians, 100, col = "cornsilk1", freq = FALSE,
+                 main = "Histogram of the median intensities",
+                 border = "antiquewhite4",
+                 xlab = "Median intensities")

@@ -10,6 +10,7 @@
 *.cel
 ## Ignore data folders
 RatClariomS_16/
+Woo_RatClariomS_18_191011/
 TAC/
 Clariom_S_Rat.r1.na36.rn6.a1.transcript.csv/
 GEO/

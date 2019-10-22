@@ -8,6 +8,8 @@ library(jaffelab)
 library(ggplot2)
 library(ggrepel)
 library(limma)
+library(viridis)
+
 theme_set(theme_bw(base_size=40) + 
             theme(panel.grid.major = element_blank(),
                   panel.grid.minor = element_blank(),
@@ -36,7 +38,6 @@ rownames(annotation) <- pd[pd$brain_region=="LA",'sampleNames']
   names(mat_colors$group) = unique(pd$Group)
   names(mat_colors)<-"Dx"
   
-library(viridis)
 pdf('plots/heatmap_amygdalaOnly_FDR10_CTRL_v_InjuryGenes.pdf',height=12,width=12,onefile=F,useDingbats=FALSE)
 pheatmap::pheatmap(signal_subset,
                    cluster_cols = FALSE,
@@ -61,15 +62,16 @@ pheatmap::pheatmap(signal_subset,
 dev.off()
 
 
-tiff('plots/heatmap_amygdalaOnly_FDR10_CTRL_v_InjuryGenes.tiff', height=12,width=12, units = "in", res = 600)
+tiff('plots/heatmap_amygdalaOnly_FDR10_CTRL_v_InjuryGenes_v3.tiff', height=12,width=12, units = "in", res = 600)
 pheatmap::pheatmap(signal_subset,
-                   cluster_cols = FALSE,
+                   cluster_cols = T,
                    clustering_distance_cols = "euclidean",
                    clustering_distance_rows = "euclidean",
                    treeheight_row=100,
                    treeheight_col=50,
                    cutree_cols = 2,
-                   gaps_col = c(3,5),
+                   cutree_rows =2,
+                   #gaps_col = c(3,5),
                    labels_row = as.character(merged_SstRma_disease[rownames(signal_subset),'Symbol']),
                    annotation_col = annotation,
                    annotation_colors=mat_colors,
