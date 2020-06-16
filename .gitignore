@@ -8,6 +8,7 @@
 *.Rhistory
 *.tiff
 *.cel
+.*pptx
 ## Ignore data folders
 RatClariomS_16/
 Woo_RatClariomS_18_191011/
